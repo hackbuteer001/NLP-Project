@@ -27,9 +27,12 @@ class Predictor(PredictorBase):
         self.sequence_length = self.config["sequence_length"]
 
         # 创建模型
+        print("create model...")
         self.create_model()
         # 加载计算图
+        print("load graph...start")
         self.load_graph()
+        print("load graph...end")
 
     def load_vocab(self):
         # 将词汇-索引映射表加载出来

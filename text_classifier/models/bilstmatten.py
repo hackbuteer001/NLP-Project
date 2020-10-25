@@ -14,6 +14,9 @@ class BiLstmAttenModel(BaseModel):
     def build_model(self):
 
         # 词嵌入层
+        # _tf.name_scope
+        # ___（1）在某个tf.name_scope()指定的区域中定义的所有对象及各种操作，他们的“name”属性上会增加该命名区的区域名，用以区别对象属于哪个区域；
+        # ___（2）将不同的对象及操作放在由tf.name_scope()指定的区域中，便于在tensorboard中展示清晰的逻辑关系图，这点在复杂关系图中特别重要
         with tf.name_scope("embedding"):
             # 利用预训练的词向量初始化词嵌入矩阵
             if self.word_vectors is not None:
@@ -84,6 +87,7 @@ class BiLstmAttenModel(BaseModel):
         hidden_size = self.config["hidden_sizes"][-1]
 
         # 初始化一个权重向量，是可训练的参数
+        # StdDev返回expr的样本标准偏差
         W = tf.Variable(tf.random_normal([hidden_size], stddev=0.1))
 
         # 对Bi-LSTM的输出用激活函数做非线性转换

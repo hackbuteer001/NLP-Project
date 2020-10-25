@@ -20,7 +20,7 @@ class BiLstmModel(BaseModel):
                 embedding_w = tf.Variable(tf.cast(self.word_vectors, dtype=tf.float32, name="word2vec"),
                                           name="embedding_w")
             else:
-                embedding_w = tf.get_variable("embedding_w", shape=[self.vocab_size, self.config["embedding_size"]],
+                embedding_w = tf.Variable("embedding_w", shape=[self.vocab_size, self.config["embedding_size"]],
                                               initializer=tf.contrib.layers.xavier_initializer())
             # 利用词嵌入矩阵将输入的数据中的词转换成词向量，维度[batch_size, sequence_length, embedding_size]
             embedded_words = tf.nn.embedding_lookup(embedding_w, self.inputs)

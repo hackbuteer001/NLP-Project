@@ -1,7 +1,10 @@
+# coding=UTF-8
 import json
 import os
 import argparse
 import sys
+from collections import Counter
+
 sys.path.append(os.path.abspath(os.path.dirname(os.getcwd())))
 
 import tensorflow as tf
@@ -27,6 +30,7 @@ class Trainer(TrainerBase):
         self.load_data()
         self.train_inputs, self.train_labels, label_to_idx = self.train_data_obj.gen_data()
         print("train data size: {}".format(len(self.train_labels)))
+        print(Counter(self.train_labels))
         self.vocab_size = self.train_data_obj.vocab_size
         print("vocab size: {}".format(self.vocab_size))
         self.word_vectors = self.train_data_obj.word_vectors
@@ -35,6 +39,7 @@ class Trainer(TrainerBase):
         self.eval_inputs, self.eval_labels = self.eval_data_obj.gen_data()
         print("eval data size: {}".format(len(self.eval_labels)))
         print("label numbers: ", len(self.label_list))
+        print(Counter(self.eval_labels))
         # 初始化模型对象
         self.create_model()
 
@@ -59,17 +64,20 @@ class Trainer(TrainerBase):
         elif self.config["model_name"] == "bilstm":
             self.model = BiLstmModel(config=self.config, vocab_size=self.vocab_size, word_vectors=self.word_vectors)
         elif self.config["model_name"] == "bilstm_atten":
-            self.model = BiLstmAttenModel(config=self.config, vocab_size=self.vocab_size, word_vectors=self.word_vectors)
+            self.model = BiLstmAttenModel(config=self.config, vocab_size=self.vocab_size,
+                                          word_vectors=self.word_vectors)
         elif self.config["model_name"] == "rcnn":
             self.model = RcnnModel(config=self.config, vocab_size=self.vocab_size, word_vectors=self.word_vectors)
         elif self.config["model_name"] == "transformer":
-            self.model = TransformerModel(config=self.config, vocab_size=self.vocab_size, word_vectors=self.word_vectors)
+            self.model = TransformerModel(config=self.config, vocab_size=self.vocab_size,
+                                          word_vectors=self.word_vectors)
 
     def train(self):
         """
         训练模型
         :return:
         """
+        # per_process_gpu_memory_fraction指定了每个GPU进程中使用显存的上限，但它只能均匀作用于所有GPU，无法对不同GPU设置不同的上限
         gpu_options = tf.GPUOptions(per_process_gpu_memory_fraction=0.9, allow_growth=True)
         sess_config = tf.ConfigProto(log_device_placement=False, allow_soft_placement=True, gpu_options=gpu_options)
         with tf.Session(config=sess_config) as sess:
@@ -100,8 +108,9 @@ class Trainer(TrainerBase):
 
                     if self.config["num_classes"] == 1:
                         acc, auc, recall, prec, f_beta = get_binary_metrics(pred_y=predictions, true_y=batch["y"])
-                        print("train: step: {}, loss: {}, acc: {}, auc: {}, recall: {}, precision: {}, f_beta: {}".format(
-                            current_step, loss, acc, auc, recall, prec, f_beta))
+                        print(
+                            "train: step: {}, loss: {}, acc: {}, auc: {}, recall: {}, precision: {}, f_beta: {}".format(
+                                current_step, loss, acc, auc, recall, prec, f_beta))
                     elif self.config["num_classes"] > 1:
                         acc, recall, prec, f_beta = get_multi_metrics(pred_y=predictions, true_y=batch["y"],
                                                                       labels=self.label_list)

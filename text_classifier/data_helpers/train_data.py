@@ -43,7 +43,8 @@ class TrainData(TrainDataBase):
                     labels.append(label)
                 except:
                     continue
-
+        print("-------------------")
+        print(Counter(labels))
         return inputs, labels
 
     def remove_stop_word(self, inputs):
@@ -140,6 +141,7 @@ class TrainData(TrainDataBase):
 
         return word_to_index, label_to_index
 
+    # 返回函数的静态方法 # 静态方法无需实例化 # 也可以实例化后调用
     @staticmethod
     def trans_to_index(inputs, word_to_index):
         """
@@ -148,7 +150,7 @@ class TrainData(TrainDataBase):
         :param word_to_index: 词汇-索引映射表
         :return:
         """
-        inputs_idx = [[word_to_index.get(word, word_to_index["<UNK>"])for word in sentence] for sentence in inputs]
+        inputs_idx = [[word_to_index.get(word, word_to_index["<UNK>"]) for word in sentence] for sentence in inputs]
 
         return inputs_idx
 
@@ -241,10 +243,11 @@ class TrainData(TrainDataBase):
         :param batch_size: 批量的大小
         :return:
         """
-        perm = np.arange(len(x))
-        np.random.shuffle(perm)
-        x = x[perm]
-        y = y[perm]
+
+        #perm = np.arange(len(x))
+        #np.random.shuffle(perm)
+        #x = x[perm]
+        #y = y[perm]
 
         num_batches = len(x) // batch_size
 
@@ -253,5 +256,4 @@ class TrainData(TrainDataBase):
             end = start + batch_size
             batch_x = np.array(x[start: end], dtype="int64")
             batch_y = np.array(y[start: end], dtype="float32")
-
             yield dict(x=batch_x, y=batch_y)

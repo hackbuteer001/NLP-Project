@@ -75,6 +75,8 @@ class Predictor(PredictorBase):
             self.model = RcnnModel(config=self.config, vocab_size=self.vocab_size, word_vectors=self.word_vectors)
         elif self.config["model_name"] == "transformer":
             self.model = TransformerModel(config=self.config, vocab_size=self.vocab_size, word_vectors=self.word_vectors)
+        elif self.config["model_name"] == "textcnn":
+            self.model = TextCnnModel(config=self.config, vocab_size=self.vocab_size, word_vectors=self.word_vectors)
 
     def predict(self, sentence):
         """
@@ -83,9 +85,16 @@ class Predictor(PredictorBase):
         :return:
         """
         sentence_ids = self.sentence_to_idx(sentence)
+        #print(sentence)
+        #print(sentence_ids)
 
         prediction = self.model.infer(self.sess, [sentence_ids]).tolist()[0]
-        label = self.index_to_label[prediction]
-        return label
+        #print(type(prediction))
+        #print(prediction)
+        #prediction = ''.join(prediction)
+        print(prediction[0])
+        return prediction[0]
+        #label = self.index_to_label[prediction]
+        #return label
 
 

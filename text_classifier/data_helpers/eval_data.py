@@ -149,8 +149,11 @@ class EvalData(EvalPredictDataBase):
         """
         perm = np.arange(len(x))
         np.random.shuffle(perm)
-        x = x[perm]
-        y = y[perm]
+        # modified by caoyu
+        #x = x[perm]
+        #y = y[perm]
+        x = np.array(x)[perm]
+        y = np.array(y)[perm]
 
         num_batches = len(x) // batch_size
 
